@@ -173,42 +173,34 @@ by   titel, beschrijving, sprekers
 order by like_count desc
 
 
-
-select * from (select titel||'- '||sprekers||'||'||slot_count||'::'||s.id sessie, start_slot, r.seq room , to_char(sl.start_time,'HH24:MI') starttime from sessions s join rooms r on (s.room=r.id) join slots sl on (s.start_slot = sl.id ))
-pivot  ( 
-  max( sessie) sessie
-  for room in ( 1,2,3,4,5 )
-)
-order by start_slot
-
 create or replace 
 view sessie_rooster
 as
 select s.start_slot, starttime
-,      substr(r1_sessie, 1, instr(r1_sessie,'||')-1) r1_sessie
-,      substr(r2_sessie, 1, instr(r2_sessie,'||')-1) r2_sessie
-,      substr(r3_sessie, 1, instr(r3_sessie,'||')-1) r3_sessie
-,      substr(r4_sessie, 1, instr(r4_sessie,'||')-1) r4_sessie
-,      substr(r5_sessie, 1, instr(r5_sessie,'||')-1) r5_sessie
-,      substr(r1_sessie, instr(r1_sessie,'::')+2) r1_id
-,      substr(r1_sessie, instr(r1_sessie,'||')+2, 1) r1_count
-,      substr(r2_sessie, instr(r2_sessie,'::')+2) r2_id
-,      substr(r2_sessie, instr(r2_sessie,'||')+2, 1) r2_count
-,      substr(r3_sessie, instr(r3_sessie,'::')+2) r3_id
-,      substr(r3_sessie, instr(r3_sessie,'||')+2, 1) r3_count
-,      substr(r4_sessie, instr(r4_sessie,'::')+2) r4_id
-,      substr(r4_sessie, instr(r4_sessie,'||')+2, 1) r4_count
-,      substr(r5_sessie, instr(r5_sessie,'::')+2) r5_id
-,      substr(r5_sessie, instr(r5_sessie,'||')+2, 1) r5_count
-,      (select beschrijving from sessions where id = substr(r1_sessie, instr(r1_sessie,'::')+2)) r1_abstract
-,      (select beschrijving from sessions where id = substr(r2_sessie, instr(r2_sessie,'::')+2)) r2_abstract
-,      (select beschrijving from sessions where id = substr(r3_sessie, instr(r3_sessie,'::')+2)) r3_abstract
-,      (select beschrijving from sessions where id = substr(r4_sessie, instr(r4_sessie,'::')+2)) r4_abstract
-,      (select beschrijving from sessions where id = substr(r5_sessie, instr(r5_sessie,'::')+2)) r5_abstract
+,      r1_sessie_id r1_id
+,      r2_sessie_id r2_id
+,      r3_sessie_id r3_id
+,      r4_sessie_id r4_id
+,      r5_sessie_id r5_id
+,      (select titel||'- '||sprekers from sessions where id = r1_sessie_id) r1_sessie
+,      (select slot_count from sessions where id = r1_sessie_id) r1_count
+,      (select beschrijving from sessions where id = r1_sessie_id ) r1_abstract
+,      (select titel||'- '||sprekers from sessions where id = r2_sessie_id) r2_sessie
+,      (select slot_count from sessions where id = r2_sessie_id) r2_count
+,      (select beschrijving from sessions where id = r2_sessie_id ) r2_abstract
+,      (select titel||'- '||sprekers from sessions where id = r3_sessie_id) r3_sessie
+,      (select slot_count from sessions where id = r3_sessie_id) r3_count
+,      (select beschrijving from sessions where id = r3_sessie_id ) r3_abstract
+,      (select titel||'- '||sprekers from sessions where id = r4_sessie_id) r4_sessie
+,      (select slot_count from sessions where id = r4_sessie_id) r4_count
+,      (select beschrijving from sessions where id = r4_sessie_id ) r4_abstract
+,      (select titel||'- '||sprekers from sessions where id = r5_sessie_id) r5_sessie
+,      (select slot_count from sessions where id = r5_sessie_id) r5_count
+,      (select beschrijving from sessions where id = r5_sessie_id ) r5_abstract
 from (
-       select * from (select titel||'- '||sprekers||'||'||slot_count||'::'||s.id sessie, start_slot, r.seq room , to_char(sl.start_time,'HH24:MI') starttime from sessions s join rooms r on (s.room=r.id) join slots sl on (s.start_slot = sl.id ))
+       select * from (select s.id sessie_id, start_slot, r.seq room , to_char(sl.start_time,'HH24:MI') starttime from sessions s join rooms r on (s.room=r.id) join slots sl on (s.start_slot = sl.id ))
        pivot  ( 
-       max( sessie) sessie
+       max( sessie_id) sessie_id
        for room in ( 1 as r1,2 as r2,3 as r3,4 as r4,5 as r5 )
      )
 ) s
